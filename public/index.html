@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chatApp - RealTime use</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <style>
+        .logo {
+            display: block;
+            margin: auto;
+            width: 50px;
+            height: 50px;
+        }
+
+        .container {
+            max-width: 955px;
+            border: 2px solid black;
+            margin: auto;
+            height: 70vh;
+            padding: 33px;
+            overflow-y: auto;
+            margin-bottom: 23px;
+            background: url("../bg.jpeg");
+        }
+
+        .message {
+            background-color: white;
+            width: 30%;
+            padding: 10px;
+            margin: 17px 12 px;
+            border: 2px solid black;
+            border-radius: 10px;
+        }
+
+        .left {
+            float: left;
+            clear: both;
+        }
+
+        .right {
+            float: right;
+            clear: both;
+        }
+
+        #send-container {
+            display: block;
+            margin: auto;
+            text-align: center;
+            max-width: 1040px;
+            width: 100%;
+        }
+
+        #messageInp {
+            width: 85%;
+            border: 2px solid black;
+            border-radius: 6px;
+            height: 40px;
+
+        }
+
+        .btn {
+            cursor: pointer;
+            border: 2px solid black;
+            border-radius: 6px;
+            margin-top: -5px;
+        }
+    </style>
+    <!-- <script src="http://localhost:8000/socket.io/socket.io.js"></script> -->
+</head>
+
+<body style="background-image: url('bg4.jpg');background-repeat: no-repeat;">
+    <div class="container mt-5">
+        <nav><img class="logo" src="icon2.png" /></nav>
+        <!-- <div class="message left">Rafay: Hey how are you?</div>
+        <div class="message right">Ammar: I am not fine</div> -->
+    </div>
+    <div class="send">
+        <form action="#" id="send-container">
+            <input type="text" name="messageInp" id="messageInp" class="shadow-lg p-3 mb-5 bg-body rounded" />
+            <button class="btn btn-danger shadow px-3 " type="submit">Send</button>
+        </form>
+    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        const socket = io("http://localhost:8000")
+
+        const form = document.getElementById("send-container");
+        const messageInput = document.getElementById("messageInp");
+        const messageContainer = document.querySelector(".container")
+
+        const append = (message, position) => {
+            const messageElement = document.createElement("div");
+            messageElement.innerHTML = message;
+            messageElement.classList.add("message");
+            messageElement.classList.add(position);
+            messageContainer.append(messageElement);
+        }
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const message = messageInput.value
+            append(`You: ${message}` , "right");
+            socket.emit("send message", message)
+            messageInput.value = ""
+        })
+
+        socket.on("receive message", data => {
+            append(`${data.name}: ${data.message}` , "left")
+        })
+
+        const userName = prompt("Enter Your Name to join: ");
+        socket.emit('new user', userName);
+
+        socket.on("new_user_join", data => {
+            console.log("Enter in new user");
+            append(`${data} joined the chat` , "left")
+        })
+
+        // const userName = prompt("Enter Your Name to join: ");
+        // socket.emit('new-user-joined', userName);
+
+        // socket.on("user-joined", data => {
+        // append(`${userName} join the chat` , "right")
+        // })
+
+        
+
+        // const socket = io('http://localhost:8000');
+        // const container = document.getElementById("container");
+        // const form = document.getElementById("chat-form");
+        // const input = document.getElementById("chat-input");
+
+        // form.addEventListener("submit", (event) => {
+        //     event.preventDefault();
+        //     if (input.value) {
+        //         socket.emit("send message", input.value)
+        //         input.value = ""
+        //     }
+        // })
+
+        // socket.on('send message', (msg) => {
+        //     const item = document.createElement("p");
+        //     item.textContent = msg;
+        //     console.log("Item: ", item);
+        //     container.appendChild(item);
+        // });
+
+        // socket.on('connect', () => {
+        //     console.log('Connected to the server');
+        // });
+
+        // socket.on('message', (message) => {
+        //     console.log('Received message:', message);
+        // });
+    </script>
+</body>
+
+</html>
